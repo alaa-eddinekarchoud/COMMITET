@@ -31,7 +31,8 @@ Git diff:
 
 
 @app.command()
-def generate():
+def generate(interactive: bool = False):
+
     result = subprocess.run(["git", "diff", "--staged"], capture_output=True, text=True)
 
     diff = result.stdout
@@ -42,7 +43,31 @@ def generate():
 
     typer.echo("Generating commit message...")
     message = get_commit_message(diff)
-    typer.echo(f"Suggested commit message :\n\n{message}")
+
+    if interactive:
+        while True:
+            typer.echo("Interactive mode!")
+            typer.echo(f"Suggested commit message :\n\n{message}")
+            typer.echo("[a] Accept & commit")
+            typer.echo("[r] Regenerate")
+            typer.echo("[e] Edit")
+            typer.echo("[q] Quit")
+            choice = typer.prompt("Your choice").strip().lower()
+            if choice == "a":
+                # commit with the message
+                break
+            elif choice == "r":
+                # regenerate
+                pass
+            elif choice == "e":
+                # let user edit
+                pass
+            elif choice == "q":
+                raise typer.Exit()
+            else:
+                typer.echo("Invalid choice, try again.")
+        else:
+            typer.echo(f"Suggested commit message :\n\n{message}")
 
 
 if __name__ == "__main__":
