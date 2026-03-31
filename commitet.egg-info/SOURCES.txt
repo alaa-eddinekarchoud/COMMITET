@@ -1,0 +1,8 @@
+pyproject.toml
+commitet.egg-info/PKG-INFO
+commitet.egg-info/SOURCES.txt
+commitet.egg-info/dependency_links.txt
+commitet.egg-info/entry_points.txt
+commitet.egg-info/top_level.txt
+gitme/__init__.py
+gitme/main.py

@@ -1,0 +1,49 @@
+import typer
+import subprocess
+import requests
+from dotenv import load_dotenv
+import os
+
+app = typer.Typer()
+
+
+def get_commit_message(diff: str) -> str:
+    load_dotenv()
+    key = os.getenv("OPENROUTER_API_KEY")
+
+    prompt = f"""You are an expert developer. Given the following git diff, generate a single conventional commit message (e.g. feat, fix, refactor, chore...).
+Reply with only the commit message, nothing else.
+
+Git diff:
+{diff}"""
+
+    response = requests.post(
+        "https://openrouter.ai/api/v1/chat/completions",
+        headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
+        json={
+            "model": "openrouter/free",
+            "messages": [{"role": "user", "content": prompt}],
+        },
+    )
+
+    data = response.json()
+    return data["choices"][0]["message"]["content"]
+
+
+@app.command()
+def generate():
+    result = subprocess.run(["git", "diff", "--staged"], capture_output=True, text=True)
+
+    diff = result.stdout
+
+    if not diff:
+        typer.echo("No staged changes found. Use git add first.")
+        raise typer.Exit()
+
+    typer.echo("Generating commit message...")
+    message = get_commit_message(diff)
+    typer.echo(f"Suggested commit message :\n\n{message}")
+
+
+if __name__ == "__main__":
+    app()
