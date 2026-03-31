@@ -2,3 +2,8 @@
 venv/
 __pycache__/
 *.pyc
+uv.lock
+.python-version
+*.egg-info/
+build/
+dist/
